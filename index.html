@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mango-check</title>
+    <style>
+        body {
+            background-image: url('3.png'); /* เปลี่ยนเป็น URL หรือไฟล์ภาพที่ต้องการ */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.85); /* สีขาวพร้อมความโปร่งใสบางส่วน */
+            padding: 20px;
+            border-radius: 50px; /* ขอบโค้งมน */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* เพิ่มเงาให้ดูมีมิติ */
+            max-width: 500px;
+            text-align: center;
+        }
+
+        #result-container {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 50px; /* ขอบโค้งมน */
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* เพิ่มเงาให้ดูมีมิติ */
+        }
+        
+        #result-title {
+            font-weight: bold;
+            font-size: 22px;
+            color: #d9534f;
+        }
+
+        #treatment {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>การวิเคราะห์ใบและผลมะม่วงผ่านเว็บไซต์โดยอาศัยปัญญาประดิษฐ์</h1> 
+        <p>"วิธีการใช้มีดังนี้"</p>
+        <p>1.อัปโหลดภาพมะม่วงที่ต้องการตรวจสอบโรค (ใบหรือผลของมะม่วง)</p>
+        <p>2.ใช้ภาพที่มีความชัดเจนและมุมมองที่ดี เพื่อความแม่นยำในการตรวจ</p>
+        <p>3.กดปุ่ม "วิเคราะห์" เพื่อให้ระบบ  AI ประมวลผลและแสดงผลออกมา</p>
+        <p>(ใช้เวลาประมวลผลประมาณ 1 วินาที ตามความเร็วอินเทอร์เน็ตของผู้ใช้)</p>
+        <p>เพิ่มเติม:ประเภทไฟล์ที่รองรับ: jpg, jpeg, png / ขนาดไฟล์สูงสุด: 5MB</p>
+        <p>"ขอบคุณที่ใช้บริการของเรา"</p>
+        <input type="file" id="imageInput" onchange="previewImage()">
+        <img id="imagePreview" style="display: none; max-width: 300px; margin-top: 40px;">
+        <button onclick="uploadImage()">วิเคราะห์</button>
+    </div>
+
+    <div id="result-container">
+        <p id="result-title"></p>
+        <p id="treatment"></p>
+    </div>
+
+    <script>
+        function previewImage() {
+            const fileInput = document.getElementById('imageInput');
+            const preview = document.getElementById('imagePreview');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '';
+                preview.style.display = 'none';
+            }
+        }
+
+        function uploadImage() {
+            let file = document.getElementById('imageInput').files[0];
+            if (!file) {
+                alert("กรุณาอัปโหลดไฟล์ภาพ");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('file', file);
+
+            fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('HTTP status ' + res.status);
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log('Data:', data);
+
+                document.getElementById('result-title').innerText = "โรคหรือศัตรูพืชที่พบ:  " + data.disease;
+                document.getElementById('treatment').innerText = "วิธีการรักษา: " + data.treatment;
+                document.getElementById('result-container').style.display = 'block';
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                document.getElementById('result-title').innerText = "เกิดข้อผิดพลาดในการส่งคำขอ.";
+                document.getElementById('treatment').innerText = "";
+                document.getElementById('result-container').style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>
+
