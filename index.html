@@ -86,39 +86,39 @@
         }
 
         function uploadImage() {
-            let file = document.getElementById('imageInput').files[0];
-            if (!file) {
-                alert("กรุณาอัปโหลดไฟล์ภาพ");
-                return;
-            }
+    let file = document.getElementById('imageInput').files[0];
+    if (!file) {
+        alert("กรุณาอัปโหลดไฟล์ภาพ");
+        return;
+    }
 
-            let formData = new FormData();
-            formData.append('file', file);
+    let formData = new FormData();
+    formData.append('file', file);
 
-            fetch('http://127.0.0.1:5000/predict', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('HTTP status ' + res.status);
-                }
-                return res.json();
-            })
-            .then(data => {
-                console.log('Data:', data);
-
-                document.getElementById('result-title').innerText = "โรคหรือศัตรูพืชที่พบ:  " + data.disease;
-                document.getElementById('treatment').innerText = "วิธีการรักษา: " + data.treatment;
-                document.getElementById('result-container').style.display = 'block';
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                document.getElementById('result-title').innerText = "เกิดข้อผิดพลาดในการส่งคำขอ.";
-                document.getElementById('treatment').innerText = "";
-                document.getElementById('result-container').style.display = 'block';
-            });
+    fetch('http://192.168.1.111:5000/predict', {  // 🔄 เปลี่ยนตรงนี้
+        method: 'POST',
+        body: formData
+    })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error('HTTP status ' + res.status);
         }
+        return res.json();
+    })
+    .then(data => {
+        console.log('Data:', data);
+
+        document.getElementById('result-title').innerText = "โรคหรือศัตรูพืชที่พบ:  " + data.disease;
+        document.getElementById('treatment').innerText = "วิธีการรักษา: " + data.treatment;
+        document.getElementById('result-container').style.display = 'block';
+    })
+    .catch(err => {
+        console.error('Error:', err);
+        document.getElementById('result-title').innerText = "เกิดข้อผิดพลาดในการส่งคำขอ.";
+        document.getElementById('treatment').innerText = "";
+        document.getElementById('result-container').style.display = 'block';
+    });
+}
     </script>
 </body>
 </html>
